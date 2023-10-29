@@ -1,6 +1,8 @@
 # termanul
 ### create command line applications on the web with xterm.js
 
+![termanul](https://media.discordapp.net/attachments/850595806045405228/1168381045217955940/image.png?ex=65518ea4&is=653f19a4&hm=a7c2a708ebb6bea3826bceaca6328646ef1b42b5093f603d7b66007d788cb086&=&width=901&height=375)
+
 termanul is a REPL, and small shell-like scripting enviroment for xterm.js implemented with async JS.
 
 ## logic
