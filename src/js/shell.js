@@ -783,9 +783,10 @@ class terminalApplication
         this.savedLine = '';
 
         this.historyIndex = -1;
+        
         this.history = [];
-
         this.logs = [];
+        this.callstack = [];
     }
 
     dereference(reference, term) 
@@ -832,7 +833,6 @@ class terminalApplication
         if(fromRepl) {term.write(CRLF);}
     
         this.savedLine = '';
-
 
         if(cmd.trim().length != 0) 
         {
