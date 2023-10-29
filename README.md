@@ -16,25 +16,89 @@ I'd like to preface this by saying that this isn't a "real" development envirome
 
 ### a functional REPL
 
-the REPL behaves like bash and supports most of the keyboard shortcuts you are used to. This includes a ctrl-c which will reject (terminate) the highest item on the interpreters callstack.
+the REPL behaves like bash and supports most of the keyboard shortcuts you are used to. This includes a ctrl-c which will reject (terminate) the highest item on the interpreter's callstack. Though the ctrl-c handler tends to crash nested commands within loops since I don't think JS handles it very well.
 
 ### a shell-like scripting enviroment.
 
-ex:
-
-```
-```
-
-see `manulscript.md` for more details.
+see `manulscript.md` for more details. Though I must reiterate, I think this tool is best used when complex commands are invoked simply through one-liners.
 
 ### built in opt parser.
 
+you can create commands to pass to interpreters like so. All opts are parsed as JSON and then type checked.
+
 ```
+let cmds = 
+{
+    test: {
+        opts:{
+            help:createOpt(
+                ["h","H"],
+                ["help"],
+                "none",
+                "help opt description"
+            )
+        },
+        callback: async (cmd, app, term) => {
+            term.write("test command called\r\n");
+            return 0;
+        },
+        desc : "test command\r\n"
+    },
+
+    shug: {
+        opts: {
+            foo:createOpt(
+                ["f","F"],
+                ["foo"],
+                "num",
+                "foo opt"
+            )
+        },
+        callback: async (cmd, app, term) => {
+            term.write("shug " + cmd.foo + " \r\n");
+            return 1;
+        },
+        desc : "another test command\r\n"
+    }
+}
+```
+
+which translates to 
+
+```
+termanul >>> test --foo
+long opt 'foo' not recognized
+parse error
+undefined
+termanul >>> test -H
+test command called
+0
+termanul >>> shug --foo 234234
+shug 234234 
+1
+termanul >>> for (manul = {echo 1 2 3 4}) {test; shug --foo &{manul}; test}
+test command called
+shug 1 
+test command called
+test command called
+shug 2 
+test command called
+test command called
+shug 3 
+test command called
+test command called
+shug 4 
+test command called
+0
 ```
 
 ### readline()
 
-it can handle I/O via async calls.
+it can handle I/O via async calls. see the `read` command implementation.
+
+### invokation from js.
+
+
  
 ## limitations
 
@@ -44,3 +108,6 @@ it's written in JS. Any blocking code will brick your entire tab. Any "blocking"
 
 to install download the most recent versions of `xterm-addon-canvas`, `xterm-addon-fit`, `xterm-addon-web-links`, `xterm-addon-webgl` and `xterm.js` and place in the `dependancides` folder. see `termanul.html` for a basic example implementation.
 
+## future considerations
+
+as I use this in other projects I will probably add onto it... though if someone more competant would like to help improve the core codebase that'd be much appreciated as I think it needs a massive refactor.

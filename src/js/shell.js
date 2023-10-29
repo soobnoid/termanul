@@ -12,7 +12,7 @@
 /**
  * name: {
  *  opts: {..}/"none"/"infix"
- *  callback: function(cmd, app, terminal)
+ *  callback: async (cmd, app, terminal) => {..}
  * }
  * */
 
@@ -830,7 +830,7 @@ class terminalApplication
     async exec (cmd, term, fromRepl)
     {
         term.repl.io = true;
-        if(fromRepl) {term.write(CRLF);}
+        if(this.callstack.length == 0) {term.write(CRLF);}
     
         this.savedLine = '';
 
@@ -850,19 +850,43 @@ class terminalApplication
             try 
             {
                 let cmds = await parseCmd(cmd, term, this);
+
                 if(cmds)
                 {
-                    let lastCmd = cmds.splice(-1, 1)[0];
-
-                    for (cmd of cmds) 
+                    for (const x in cmds) 
                     {
-                        this.cmds[cmd.name].callback(cmd, this, term);
-                    }
+                        let cmd = cmds[x];
 
-                    let ret = this.cmds[lastCmd.name].callback(lastCmd, this, term);
-                    term.repl.io = false;
-                    return ret;
+                        let out = new Promise((resolve, reject) => {
+                            let ret = this.cmds[cmd.name].callback(cmd, this, term);
+                            
+                            this.callstack.push(
+                                {
+                                    "cmd": cmd,
+                                    "reject": reject,
+                                    "resolve": resolve
+                                }
+                            );
+    
+                            ret.then((val) => {
+                                term.repl.io = false;
+                                term.repl.ioHandler = null;
+                                this.callstack.pop();
+                                resolve(val);
+                            })
+                            .catch(() => {
+                                term.repl.io = false;
+                                term.repl.ioHandler = null;
+                                this.callstack.pop();
+                                resolve(null);
+                            });
+                        });
+
+                        if(x == cmds.length - 1) {return out;}
+                        else {await out;}
+                    }
                 }
+
                 else
                 {
                     term.write("parse error\r\n");
@@ -879,7 +903,11 @@ class terminalApplication
                 return null;
             }
         }
-        else {return null;}
+        else 
+        {
+            term.repl.io = false;
+            return null;
+        }
     } 
 }
 
@@ -892,7 +920,7 @@ let baseShell = {
                 ["h","H"],
                 ["help"],
                 "none",
-                "help description"
+                "help opt description"
             )
         },
         callback: async (cmd, app, term) => {
@@ -946,20 +974,38 @@ let baseShell = {
         desc: "demonstrate that infix commands work\r\n"
     },
 
+    str: {
+        opts: "none",
+        callback: async (cmd, app, term) => {
+            return '"' + String(cmd.rest[0]) + '"'; 
+        },
+        desc : "encapsulate output in quotes\r\n"
+    },
+
+    "*" : {
+        opts: "none",
+        callback: async (cmd, app, term) => {return null},
+        desc : "do nothing... for when we want to inline for side effects (eg setting a variable)"
+    },
+
     for: {
         opts: "none",
         callback: async (cmd, app, term) => {
             
             let ref = await lexReference(unwrapToken(cmd.rest[0]), term);
             let set = await app.exec(unwrapToken(ref.assignment), term);
-            
-            clause = unwrapToken(cmd.rest[1]);
 
-            for(index in set)
-            { 
-                ref.assignment = set[index];
-                app.dereference(ref, term);
-                await app.exec(clause, term);
+            if(set)
+            {
+                clause = unwrapToken(cmd.rest[1]);
+
+                for(index in set)
+                { 
+                    ref.assignment = set[index];
+                    app.dereference(ref, term);
+                    try {await app.exec(clause, term);}
+                    catch {}
+                }
             }
 
             return 0;
@@ -1015,7 +1061,15 @@ let baseShell = {
         callback: async (cmd, app, term) => {
             return cmd.rest;
         },
-        desc : "returns list of tokens passed"
+        desc : "returns list of tokens passed\r\n"
+    },
+
+    get: {
+        opts: "none",
+        callback: async (cmd, app, term) => {
+            return cmd.rest[0];
+        },
+        desc : "returns first token passed\r\n"
     },
 
     write: {
@@ -1036,14 +1090,7 @@ let baseShell = {
             docs(app.cmds, cmd.rest[0], term);
             return null;
         },
-        desc : "print help for commands"
-    },
-
-    env: {
-        opts: "none",
-        callback: async (cmd, app, term) => {
-            term.write(JSON.stringify(app.env));
-        }
+        desc : "print help for commands\r\n"
     }
 };
 
@@ -1086,16 +1133,16 @@ function docs (cmds, commandName, term)
         for (const cmdName in cmds) 
         {
             const cmd = cmds[cmdName];
-            term.write(`Command: ${cmdName}\r\n`);
+            term.write(`${cmdName}:\r\n`);
             
             term.write(`  desc: ${cmd.desc}`);
 
             if (cmd.opts == "infix")
             {
-                term.write("  infix\r\n");
+                term.write("  infix\r\n\r\n");
             }
 
-            else if (cmd.opts == "none") {}
+            else if (cmd.opts == "none") {term.write("\r\n");}
 
             else  
             {
@@ -1123,9 +1170,9 @@ function docs (cmds, commandName, term)
                         term.write(`    type = ${option.input}\r\n`);
                     }
               }
+
+              term.write("\r\n");
             }
-        
-            term.write("\r\n");
         }
     } 
     

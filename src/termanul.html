@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- twhat the fuck is uhhhh terminal !-->
+
+<html>
+    <head>
+        <title>termanul</title>
+        <script src="/js/dependancies/xterm.js"></script>
+        <script src="/js/dependancies/xterm-addon-canvas.js"></script>
+        <script src="/js/dependancies/xterm-addon-webgl.js"></script>
+        <script src="/js/dependancies/xterm-addon-fit.js"></script>
+        <script src="/js/dependancies/xterm-addon-web-links.js"></script>
+       
+        <script src="/js/termanul.js"></script>
+        <script src="/js/shell.js"></script>
+        
+        <link rel="stylesheet" href="/css/xterm.css"/>
+    </head>
+
+    <style>
+        
+        body {
+            margin: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #terminal{
+            width: 100vw;
+            height: 100vh;
+        
+            background: #2f374f;
+        }
+
+    </style>
+    
+    <body>
+        <div>
+            <div id="terminal"></div>
+        </div>
+        
+        <script>
+            let term = new XtermJsInstance(document.getElementById("terminal"));
+            let REPL = new repl(baseInterpreter, term);
+
+            addXtermJsResizeHandler(term, REPL);
+            term.autofit();
+            window.addEventListener("resize", term.autofit);
+        </script>
+    </body>
+</html>

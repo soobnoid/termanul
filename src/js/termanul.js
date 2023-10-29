@@ -51,7 +51,6 @@ class XtermJsInstance
         );
         
         this.term.open(container);
-
         this.term.write(LINE_WRAP);
 
         // set webgl as default renderer and browser
@@ -173,6 +172,22 @@ class repl
 
         this.replHandler = (ev) => 
         {
+
+            if(ev == "\u0003")
+            {
+                if(this.app.callstack.length > 0)
+                {
+                    term.write("^C" + CRLF);
+                    this.app.callstack.pop().reject();
+                }
+
+                if(!this.io)
+                {
+                    this.resetLine();
+                }
+
+            }
+
             if(!this.io || this.ioHandler)
             {
                 switch(ev)
@@ -468,6 +483,8 @@ class repl
 // we can free the terminal
 // up for I/O.
 
+// don't 
+
 function run (repl) 
 {
     let appLine = repl.currLine;
@@ -481,6 +498,7 @@ function run (repl)
         repl.IOprompt  = '';
         repl.currLine  = '';
         repl.term.write(CRLF);
+        repl.io = false;
         repl.showLine();
     }
 
@@ -495,15 +513,17 @@ function run (repl)
                 }
         
                 else {repl.term.write(String(undefined))};
-         
                 closeCmd();
             }
         )
         .catch((e) =>
         {
-            term.write(sanitize(String(e)) + "\r\n");
-            console.log(e);
-            term.write("command did not complete\r\n"); 
+            if(e)
+            { 
+                term.write(sanitize(String(e)) + "\r\n");
+                console.log(e);
+            }
+
             closeCmd();
         })
      }, 
