@@ -108,7 +108,7 @@ it's written in JS. Any blocking code will brick your entire tab. Any "blocking"
  
 ## install
 
-to install download the most recent versions of `xterm-addon-canvas`, `xterm-addon-fit`, `xterm-addon-web-links`, `xterm-addon-webgl` and `xterm.js` and place in the `dependancides` folder. see `termanul.html` for a basic example implementation.
+to install download the most recent versions of `xterm-addon-canvas`, `xterm-addon-fit`, `xterm-addon-web-links`, `xterm-addon-webgl` and `xterm.js` and place in the `dependancides` folder. you need to host the contents of `src` on some sort of webserver, just viewing the file locally will not work. See `termanul.html` for a basic example implementation.
 
 ## future considerations
 
