@@ -10,6 +10,8 @@ when inlining with `()` you invoke a command, when inlining with `{}`
 
 I made a few basic "builtins" that demonstrate some basic functionality. 
 
+here are some examples demonstrating those.
+
 ```
 termanul >>> * ${manul = {"manuls":["polly", "lev"]}}
 undefined
