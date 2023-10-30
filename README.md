@@ -100,7 +100,7 @@ it can handle I/O via async calls. see the `read` command implementation.
 
 ### invokation from js.
 
-
+working on making it more reliable by refactoring some code, but you can `await interpreter.exec()` commands. and get the return value as a JSON object.
  
 ## limitations
 
