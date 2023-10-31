@@ -535,7 +535,7 @@ function parseLine(
 
     else 
     {
-        term.write("cmd '" + result.name + "' not found\r\n");
+        term.write("cmd '" + cmd[0] + "' not found\r\n");
         return null;
     }
     return result;

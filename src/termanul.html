@@ -39,7 +39,17 @@
         </div>
         
         <script>
-            let term = new XtermJsInstance(document.getElementById("terminal"));
+            let term = new XtermJsInstance(document.getElementById("terminal"), 
+            {
+                cursorBlink:"block",
+                fontSize : 20,
+                scrollback: 99999999, // this is the recomended
+                                      // way to do infinite scrollback
+                theme: {
+                        background: '#2f374f',
+                }
+            });
+
             let REPL = new repl(baseInterpreter, term);
 
             addXtermJsResizeHandler(term, REPL);

@@ -35,20 +35,26 @@ const NEXT_LINE = CSI + "E";
 
 class XtermJsInstance
 {
-    constructor (container) 
+    constructor (container, options) 
     {
-        this.container = container;
 
-        this.term = new Terminal(
-            {
+        if(!options) 
+        {
+            options = {
                 cursorBlink:"block",
+                fontFamily : 'Fira Code Nerd Font',
+                fontSize : 20,
                 scrollback: 99999999, // this is the recomended
                                       // way to do infinite scrollback
                 theme: {
-                        background: '#2f374f'
+                        background: '#2f374f',
                 }
-            }
-        );
+            };
+        }
+
+        this.container = container;
+
+        this.term = new Terminal(options);
         
         this.term.open(container);
         this.term.write(LINE_WRAP);
