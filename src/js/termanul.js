@@ -37,21 +37,6 @@ class XtermJsInstance
 {
     constructor (container, options) 
     {
-
-        if(!options) 
-        {
-            options = {
-                cursorBlink:"block",
-                fontFamily : 'Fira Code Nerd Font',
-                fontSize : 20,
-                scrollback: 99999999, // this is the recomended
-                                      // way to do infinite scrollback
-                theme: {
-                        background: '#2f374f',
-                }
-            };
-        }
-
         this.container = container;
 
         this.term = new Terminal(options);
@@ -185,11 +170,13 @@ class repl
                 {
                     term.write("^C" + CRLF);
                     this.app.callstack.pop().reject();
+                    return;
                 }
 
                 if(!this.io)
                 {
                     this.resetLine();
+                    return;
                 }
 
             }
@@ -421,10 +408,7 @@ class repl
         {
             prefix = this.IOprompt;
         }
-        else
-        {
-            prefix = this.app.promptStr;
-        }
+        else {prefix = this.app.promptStr;}
 
         this.term.write(CURSOR_HIDE);
         this.term.write(prefix);
@@ -437,17 +421,8 @@ class repl
 
     clearLine () 
     {
-
-        let prefix = '';
-
-        if(this.ioHandler) 
-        {
-            prefix = this.IOprompt;
-        }
-        else
-        {
-            prefix = this.app.promptStr;
-        }
+        let prefix = this.app.promptStr.length
+        if(this.ioHandler) {prefix = this.IOprompt.length;}
 
         const lines = Math.floor(
             (this.currLine.length + prefix - 1) / this.term.getCols()
@@ -476,11 +451,25 @@ class repl
                  
         this.term.write(CURSOR_SHOW);
     }
- 
+
     resetLine()
     {
         this.currLine = "";
         this.lineIndex = 0;
+    }
+
+    showLine ()
+    {
+        let prefix = this.app.promptStr;
+        if(this.ioHandler) {prefix = this.IOprompt;}
+
+        this.term.write(CURSOR_HIDE);
+        this.term.write(prefix);
+        this.term.write(this.currLine.slice(0, this.lineIndex));
+        this.term.write(CURSOR_SAVE);
+        this.term.write(this.currLine.slice(this.lineIndex));
+        this.term.write(CURSOR_RESTORE);
+        this.term.write(CURSOR_SHOW);
     }
 }
 

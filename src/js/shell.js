@@ -1048,7 +1048,8 @@ let baseShell = {
             { 
                 ref.assignment = set[index];
                 app.dereference(ref, term);
-                set[index] = await app.exec(clause, term);
+                try {set[index] = await app.exec(clause, term);}
+                catch {set[index] = null;}
             }
 
             return set;
