@@ -34,7 +34,7 @@ the `*` command does nothing... it is for when you want to inline only for side 
 
 ## infix commands
 
-you may define infix/ternary commands which are executed if they are the second token of the line, with the preceding token becoming a special `left` argument. All args after that are treated normally.
+you may define infix/ternary commands which are executed if they are the second token of the line, with the preceding token becoming a special `left` and everything after being the `rest`. While these args aren't type checked, since infix commands are more so meant to act like tradditional operators, though there is nothing stopping you from lexing `left` and `rest`  
 
 ## examples
 
@@ -93,6 +93,7 @@ test command called
 you may also invoke scripts with `await interpreter.exec("echo cmd", term)`, though side effects may make that a bad idea. Making this more reliable is a top priority.
 
 ## TOOO 
+
 ### more documentation.
 
 
