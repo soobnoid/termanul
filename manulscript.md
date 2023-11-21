@@ -1,16 +1,40 @@
-# manulscript
+![image](https://github.com/soobnoid/termanul/assets/149321534/07f77886-59d7-478d-a1cf-9270b5d7b4e0)# manulscript
 
-the whole thing is pretty wip, so I'm writing this with the assumption that the read already knows how to program.
+the whole thing is pretty WIP, so I'm writing this with the assumption that the reader already knows how to program.
 
-to see how the builtin commands are implemented look at `shell.js` all builtins are simple and written with readable code, commands are passed to the interpreter as objects, which are then invoked. Most builtins recursively invoke the parser on tokenized expressions, tokens are parsed and split by whitespace, excluding anything wrapped in (), [], or {}, and strings wrapped in '"' and "'". tokens are parsed by line. each line can be cut short by a semicolon (;), and may only contain one command. most "builtins" will remove the grouping symboles within tokens and attempt to execute what's inside. also, with this in mind, as of right now... the parser does not care which grouping symbols you use to tokenize you symbols except when you are inlining (see below).
+basically termanul is split into two parts... the REPL, which handles I/O, and the interpreter which runs commands. The interpreter works by lexing the line passed to it, and splitting each whitespace seperated string or value enclosed by a grouping symbol `()/[]/{}`. `;` starts a new line, which will be executed after the one before it. the result of an interpreter operation will always be the return value of the last line.
 
-you may also `inline`, or by invoking `$` and `&`. `$` does a first-pass inline and runs the command and substitutes the output, and `&` only inlines when the token is parsed in scope, aka when it is not within any grouping symbols. In practice this makes little difference except for commands like `for` and `map` that take commands as arguments, where we want to dereference a symbol after assignment on each round.
+Technically you can only execute one command at once, but builtin commands like `for` and `map` bypass this restriction by recursively invoking the interpreter/dereferencer and using lazy inlining. When inlining the interpreter also recursively invokes itself. Since return values/variables are stored as JS objects so "piping" (in the powershell sense... we aren't actually passing IO handles) is relatively easy.   
 
-when inlining with `()` you invoke a command, when inlining with `{}`
+## inlining
 
-I made a few basic "builtins" that demonstrate some basic functionality. 
+it works like it does in bash... more self invokation.
 
-here are some examples demonstrating those.
+you may perform both direct and `lazy` substitutions with the `inline` operators `$` (direct) and `&` (lazy). both `inline` operators should be immediatly followed by either `{}` or `()`. `{}` will inline a reference, `()` will inline a command. The only difference between the two operators is that the lazy (`&`) inliner will only inline if it is not within a grouping symbol. Other than the more contrived example below, this is to enable commands like `for` to reassign the inlined reference on each loop iteration.
+
+ex:
+```
+termanul >>> write {&(test)}
+{&(test)}
+undefined
+termanul >>> write {$(test)}
+
+test command called
+{0}
+undefined
+```
+
+## references/enviromental variables
+
+`references` are invoked with the `inline` operators and will substitue the value of the variable. References may additionally use the `=` operator to assign the variable a valid JSON object. all untaken names in the root namespace (no `.` operators) are `null` until initialized. The entire namespace directly maps back to the js namespace. 
+
+## *
+
+the `*` command does nothing... it is for when you want to inline only for side effect, like if you want to assign a variable but do nothing with it. 
+
+## infix commands
+
+you may define infix/ternary commands which are executed if they are the second token of the line, with the preceding token becoming a special `left` argument. All args after that are treated normally.
 
 ```
 termanul >>> * ${manul = {"manuls":["polly", "lev"]}}
@@ -64,8 +88,9 @@ test command called
 0
 ```
 
-you may also invoke scripts with `await interpreter.exec("echo cmd", term)`, though side effects may make that a bad idea. Making this more reliable is a top priority. Also I feel as though I shouldn't have to mention this, but do not try running a command when another callstack is active.
+you may also invoke scripts with `await interpreter.exec("echo cmd", term)`, though side effects may make that a bad idea. Making this more reliable is a top priority.
 
 ## TOOO 
 ### more documentation.
+
 
