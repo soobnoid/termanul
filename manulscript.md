@@ -36,6 +36,8 @@ the `*` command does nothing... it is for when you want to inline only for side 
 
 you may define infix/ternary commands which are executed if they are the second token of the line, with the preceding token becoming a special `left` argument. All args after that are treated normally.
 
+## examples
+
 ```
 termanul >>> * ${manul = {"manuls":["polly", "lev"]}}
 undefined
