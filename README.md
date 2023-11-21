@@ -1,24 +1,23 @@
 # termanul
 ### create command line applications on the web with xterm.js
 
-![termanul](https://media.discordapp.net/attachments/850595806045405228/1168381045217955940/image.png?ex=65518ea4&is=653f19a4&hm=a7c2a708ebb6bea3826bceaca6328646ef1b42b5093f603d7b66007d788cb086&=&width=901&height=375)
+![termanul](https://github.com/soobnoid/termanul/assets/149321534/d37b8fe5-4b13-4414-8b31-05376c442728)
 
 termanul is a REPL, and small shell-like scripting enviroment for xterm.js implemented with async JS.
 
 ## logic
 
-creating web UIs to manage resources is difficult, UIs typically don't offer much interoperability with one and another, and the process is incredibly time consuming. 
-on the other hand... command line applications are easier to write, faster, and provide interoperability with one and another.
-
-so I guess you can create "managment consoles" with this.
+Command line applications are easy to write and "clean"... though they cannot interact with dynamic web content. Similarly, web content cannot easily display pty output. termanul is a complete PTY scripting enviroment running within the browser. Thus, command line utilities written in it can access your pages DOM, and can wrap around your API much more thinly than a traditional GUI. Similarly, since XtermJs is a full PTY you can attach other terminal sessions over websockets if you want.  
 
 ## features
 
-I'd like to preface this by saying that this isn't a "real" development enviroment. Termanul exists to call thinly mapped JS functions that interface with your backend. Though whith that in mind, it's scripting abilities are strong enough to implement some degree of control flow... though I would advise against it. If you need to store a script, use the ".manul" extension ig. 
+I'd like to preface this by saying that this isn't a "real" development enviroment. Termanul exists to call thinly mapped JS functions that interface with your backend. Though whith that in mind, it's scripting abilities are strong enough to implement some degree of control flow... though I would advise against it. 
+
+If you need to store a script, use the .manul extension I guess. 
 
 ### a functional REPL
 
-the REPL behaves like bash and supports most of the keyboard shortcuts you are used to. This includes a ctrl-c which will reject (terminate) the highest item on the interpreter's callstack. Though the ctrl-c handler tends to crash nested commands within loops since I don't think JS handles it very well.
+the REPL behaves like bash and supports most of the keyboard shortcuts you are used to. This includes a ctrl-c which will reject (terminate) the highest item on the interpreter's callstack. Though the ctrl-c handler tends to crash outer commands within nested loops.
 
 ### a shell-like scripting enviroment.
 
@@ -97,10 +96,10 @@ test command called
 ### readline()
 
 it can handle I/O via async calls. see the `read` command implementation.
-
+ 
 ### invokation from js.
 
-working on making it more reliable by refactoring some code, but you can `await interpreter.exec()` commands. and get the return value as a JSON object.
+while it's not the most reliable you can `await interpreter.exec()` commands and get the return value as an object. 
  
 ## limitations
 
@@ -112,4 +111,4 @@ to install download the most recent versions of `xterm-addon-canvas`, `xterm-add
 
 ## future considerations
 
-as I use this in other projects I will probably add onto it... though if someone more competant would like to help improve the core codebase that'd be much appreciated as I think it needs a massive refactor.
+as I use this in other projects I will probably add onto it... anyone who wants to contribute is welcome. 
