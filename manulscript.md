@@ -1,4 +1,4 @@
-![image](https://github.com/soobnoid/termanul/assets/149321534/07f77886-59d7-478d-a1cf-9270b5d7b4e0)# manulscript
+# manulscript
 
 the whole thing is pretty WIP, so I'm writing this with the assumption that the reader already knows how to program.
 
